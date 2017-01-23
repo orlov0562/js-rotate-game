@@ -1,0 +1,130 @@
+<html>
+<head>
+<style>
+#playground {
+  width:480px;
+  height: 640px;
+  background-color: #FAFAFA;
+  border: 1px solid silver;
+  position: relative;
+}
+
+#basket {
+  position:absolute;
+  bottom:15px;
+  left: 140px;
+  border-radius: 100px;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  
+}
+
+#basket > div {
+  width: 98px;
+  height:98px;
+  position: absolute;
+  cursor: pointer;
+  border:1px solid white;
+}
+
+.col_1 {background-color:green;}
+.col_2 {background-color:blue;}
+.col_3 {background-color:red;}
+.col_4 {background-color:#00BBC5;}
+
+#basket>.col_1 {top:0; left:0;}
+#basket>.col_2 {top:0; right:0;}
+#basket>.col_3 {bottom:0; right:0;}
+#basket>.col_4 {bottom:0; left:0;}
+
+#basket_cutter {
+  position:absolute;
+  top:400px;
+  width:50px;
+  height:50px;
+  left: 215px;
+  border-radius:25px;
+  background-color:#FAFAFA;
+}
+
+#ball {
+  position:absolute;
+  top:0px;
+  width:50px;
+  height:50px;
+  left: 215px;
+  border-radius:25px;
+}
+</style>
+</head>
+<body>
+<button id="game">Start game</button>
+<div id="playground">
+    <div id="basket">
+      <div class="col_1"></div>
+      <div class="col_2"></div>
+      <div class="col_3"></div>
+      <div class="col_4"></div>      
+    </div>
+    <div id="basket_cutter"></div>    
+    <div id="ball"></div>    
+</div>
+<div id="log"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script>
+var angle = -45;
+var basket_cl = 2; // current basket color [1..4]
+var ball_cl = 0; // current ball color [1..4]
+var ball_pos = 0;
+var ball_catched = 0;
+var game = null;
+var speed = 50;
+
+$('#basket').click(function(){
+    angle += 90;
+    if (--basket_cl<1) basket_cl=4;
+    $('#basket').css({
+      'transition': 'transform .25s',
+      'transform': 'rotate(' + angle + 'deg)'
+    });
+});
+
+$('#game').click(function(){
+  level = 0;
+  speed = 50;
+  new_ball();
+});
+
+function new_ball(){
+  if (game) clearInterval(game);
+  ball_cl = Math.round(Math.random() * 4 + 0.5);
+	$('#ball').attr('class', 'col_'+ball_cl);
+  ball_pos = 0;
+  game = setInterval(function(){
+  	ball_pos+=3;
+    if (ball_pos>=400) {
+    	if (ball_cl == basket_cl) {
+        level++;
+    	  $('#log').html('Level: '+level);        
+        speed-=level*0.5;
+        if (speed<40) speed = 40;
+      	new_ball();
+      } else {
+    		$('#log').html('Level: '+level+'; Game over!');
+        clearInterval(game);
+      }
+    } else {
+      $('#ball').css('top', ball_pos);
+    }
+  }, speed);
+
+}
+
+
+$(function(){
+	$('#basket').click();
+});
+</script>
+</body>
+</html>
